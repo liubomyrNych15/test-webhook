@@ -13,13 +13,10 @@ export class GoogleSheetsService {
 
   constructor() {
     try {
-      const credentialsPath = path.join(process.cwd(), process.env.GOOGLE_CREDENTIALS_PATH);
-      const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
-
       this.auth = new google.auth.JWT(
-        credentials.client_email,
+        process.env.GOOGLE_CREDENTIALS_CLIENT_EMAIL,
         null,
-        credentials.private_key,
+        process.env.GOOGLE_CREDENTIALS_PRIVATE_KEY,
         [
           'https://www.googleapis.com/auth/spreadsheets',
         ],
