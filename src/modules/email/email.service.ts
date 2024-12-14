@@ -91,7 +91,7 @@ export class EmailService {
 
       const msg = {
         to,
-        from: 'liubomyr.nych@gmail.com',
+        from: process.env.FROM_EMAIL,
         subject,
         text: content,
         html: htmlContent,

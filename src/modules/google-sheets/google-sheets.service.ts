@@ -7,6 +7,7 @@ import * as path from 'path';
 @Injectable()
 export class GoogleSheetsService {
   private readonly logger = new Logger(GoogleSheetsService.name);
+  private readonly range: string = process.env.GOOGLE_SHEET_RANGE;
   private sheets: sheets_v4.Sheets;
   private auth: JWT;
 
@@ -34,11 +35,10 @@ export class GoogleSheetsService {
   }
 
   async addRow(sheetId: string, row: string[]): Promise<void> {
-    const range = `'Аркуш1'!A1:Z`; 
     try {
       await this.sheets.spreadsheets.values.append({
         spreadsheetId: sheetId,
-        range,
+        range: this.range,
         valueInputOption: 'RAW',
         requestBody: {
           values: [row],
@@ -46,7 +46,7 @@ export class GoogleSheetsService {
       });
       this.logger.log(`Row added to Google Sheet: ${JSON.stringify(row)}`);
     } catch (error) {
-      this.logger.error(`Failed to add row to Google Sheet in range: ${range}`, error.stack);
+      this.logger.error(`Failed to add row to Google Sheet`, error.stack);
       throw error;
     }
   }
@@ -59,17 +59,16 @@ export class GoogleSheetsService {
       this.logger.log(`Fetched sheet names: ${sheetNames}`);
       return sheetNames;
     } catch (error) {
-      this.logger.error(`Failed to fetch sheet names for sheetId: ${sheetId}`, error.stack);
+      this.logger.error(`Failed to fetch sheet names for sheet`, error.stack);
       throw error;
     }
   }
 
   async getReviewers(sheetId: string): Promise<{ reviewer: string; rowsAdded: number }[]> {
-    const range = `'Аркуш1'!A1:Z`; 
     try {
       const result = await this.sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
-        range,
+        range: this.range,
       });
 
       const rows = result.data.values || [];
@@ -88,17 +87,16 @@ export class GoogleSheetsService {
 
       return reviewerData;
     } catch (error) {
-      this.logger.error(`Failed to fetch reviewers from Google Sheet in range: ${range}`, error.stack);
+      this.logger.error(`Failed to fetch reviewers from Google Sheet`, error.stack);
       throw error;
     }
   }
 
   async getRecipients(sheetId: string): Promise<string[]> {
-    const range = `'Аркуш1'!A1:Z`;
     try {
       const result = await this.sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
-        range,
+        range: this.range,
       });
 
       const rows = result.data.values || [];
@@ -118,10 +116,9 @@ export class GoogleSheetsService {
 
   async getAllRecipients(sheetId: string): Promise<string[]> {
     try {
-      const range = `'Аркуш1'!A1:A`;
       const result = await this.sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
-        range,
+        range: this.range,
       });
   
       const rows = result.data.values || [];
